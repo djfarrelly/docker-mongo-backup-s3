@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [[ -v CRONHUB_KEY ]]; then
+  curl -fsS --retry 3 https://cronhub.io/start/$CRONHUB_KEY
+fi
+
 # Requires these environment variables to be set:
 # DB_URL
 # DB_USER
@@ -53,3 +57,7 @@ rm -rf $DUMP_DIR
 rm $fileName
 
 echo "Database backup successful at $dateFormatted"
+
+if [[ -v CRONHUB_KEY ]]; then
+  curl -fsS --retry 3 https://cronhub.io/finish/$CRONHUB_KEY
+fi
