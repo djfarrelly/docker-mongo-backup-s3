@@ -43,12 +43,27 @@ relativePath="/${S3_BUCKET}/${fileName}"
 contentType="application/octet-stream"
 stringToSign="PUT\n\n${contentType}\n${dateFormatted}\n${relativePath}"
 signature=`echo -en ${stringToSign} | openssl sha1 -hmac ${AWS_SECRET_ACCESS_KEY} -binary | base64`
-curl -X PUT -T "${fileName}" \
+responseFile="response.txt"
+statusCode=$(curl -s --write-out %{http_code} -o $responseFile \
+  -X PUT -T "${fileName}" \
   -H "Host: ${S3_BUCKET}.s3.amazonaws.com" \
   -H "Date: ${dateFormatted}" \
   -H "Content-Type: ${contentType}" \
   -H "Authorization: AWS ${AWS_ACCESS_KEY_ID}:${signature}" \
-  http://${S3_BUCKET}.s3.amazonaws.com/${fileName}
+  http://${S3_BUCKET}.s3.amazonaws.com/${fileName})
+
+curlExitCode="$?"
+
+if [[ "${curlExitCode}" != "0" ]]; then
+  echo "Upload failed - curl error:"
+  cat $responseFile
+  exit 1
+fi
+if [[ "$statusCode" != "200" ]]; then
+  echo "Upload failed - Status Code: $statusCode - Response:"
+  cat $responseFile
+  exit 2
+fi
 
 echo "Upload complete."
 
