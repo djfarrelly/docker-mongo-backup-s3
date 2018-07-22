@@ -1,4 +1,4 @@
-# mongo-backup-s3
+# docker-mongo-backup-s3
 
 Docker image and script to create a mongo backup and upload to s3.
 
