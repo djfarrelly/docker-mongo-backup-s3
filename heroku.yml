@@ -1,0 +1,9 @@
+setup:
+  addons:
+    - plan: 'scheduler:standard'
+      as: SCHEDULER
+build:
+  docker:
+    web: Dockerfile
+run:
+  web: echo "noop"
